@@ -2,16 +2,8 @@ class Figure:
     side_count = 0
 
     def __init__(self, rgb, *sides):
-        self.__sides = [int(x) for x in sides]
-        self.__color = list(rgb)
-        if self.side_count == 12 and len(self.__sides) != 1:
-            self.__sides = [1 for _ in range(self.side_count)]
-        elif self.side_count == 12 and len(self.__sides) == 1:
-            self.__sides = [sides[0] for _ in range(self.side_count)]
-        if self.side_count == 3 and len(self.__sides) != self.side_count:
-            self.__sides = [1 for _ in range(self.side_count)]
-        if self.side_count == 1 and len(self.__sides) != self.side_count:
-            self.__sides = [1 for _ in range(self.side_count)]
+        self.__sides = list(sides) if self.__is_valid_sides(sides) else [1 for _ in range(self.side_count)]
+        self.__color = list(rgb) if self.__is_valid_color(*rgb) else [0, 0, 0]
         self.filled = True
 
     def get_color(self):
@@ -38,14 +30,8 @@ class Figure:
         return sum(self.__sides)
 
     def set_sides(self, *new_sides):
-        if self.side_count != 12:
-            if self.__is_valid_sides(new_sides):
-                self.__sides = list(new_sides)
-        elif self.__is_valid_sides(new_sides):
-            if all(new_sides[0] == _ for _ in new_sides):
-                self.__sides = [new_sides[0] for _ in range(12)]
-            else:
-                print("Введенные стороны не равны, изменения не приняты !")
+        if self.__is_valid_sides(new_sides):
+            self.__sides = list(new_sides)
 
 
 class Circle(Figure):
@@ -62,13 +48,10 @@ class Circle(Figure):
 class Triangle(Figure):
     side_count = 3
 
-    def __init__(self, rgb, *sides):
-        super().__init__(rgb, *sides)
-
     def get_square(self):
-        list_ = super().get_sides()
-        p = 0.5 * sum(list_)
-        return (p * (p - list_[0]) * (p - list_[1]) * (p - list_[2])) ** 0.5
+        a, b, c = self.get_sides()
+        p = 0.5 * len(self)
+        return (p * (p - a) * (p - b) * (p - c)) ** 0.5
 
 
 class Cube(Figure):
@@ -76,13 +59,13 @@ class Cube(Figure):
 
     def __init__(self, rgb, *sides):
         super().__init__(rgb, *sides)
-
+        self.set_sides(*list(sides) * 12)
 
     def get_volume(self):
         return super().get_sides()[0] ** 3
 
 
-circle1 = Circle((200, 200, 100), 10)
+circle1 = Circle((200, 200, 100), 10, )
 cube1 = Cube((222, 35, 130), 6)
 
 circle1.set_color(55, 66, 77)
